@@ -1,11 +1,21 @@
 import { Schema, model } from "mongoose";
 import { Guardian, Student, UserName } from "./student/student.interface";
+import validator from "validator";
 
 //schema class e student er instance userName set kore type er moto use kora
 const userNameSchema = new Schema<UserName>({
   firstName: {
     type: String,
-    required: true,
+    required: [true, "vi first name lagbei lagbe"],
+    maxlength: 15,
+    minLength: 2,
+    validate: {
+      validator: function (value: string) {
+        const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1);
+        return firstNameStr === value;
+      },
+      message: "{VALUE} is not in capitalize format",
+    },
   },
   lastName: {
     type: String,
@@ -30,20 +40,66 @@ const loaclGuardanSchema = new Schema({
 });
 // schema class diye student
 const studentSchema = new Schema<Student>({
-  id: { type: Number },
-  name: userNameSchema,
-  gender: ["male", "female"],
-  contactNumber: { type: String, required: true },
+  id: { type: Number, required: true, unique: true },
+  name: {
+    type: userNameSchema,
+    required: [true, "Please enter your name"],
+  },
+  gender: {
+    type: String,
+    enum: {
+      values: ["male", "female", "others"],
+      message: "{VALUE} is not supported",
+    },
+    required: [true, "please enter your gender"],
+  },
+  contactNumber: {
+    type: String,
+    required: [true, "Please Enter your contact number"],
+  },
   emergencyNumber: { type: String, required: true },
-  dateOfBirth: { type: String, required: true },
-  email: { type: String, required: true },
-  bloodGroup: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+  dateOfBirth: {
+    type: String,
+    required: [
+      true,
+      "please enter your emergency number so that we can reach you",
+    ],
+  },
+  email: {
+    type: String,
+    required: [true, "please enter your email address"],
+    unique: true,
+    validate: {
+      validator: (value: string) => {
+        validator.isEmail(value);
+      },
+      message: "{VALUE} is not a valid email",
+    },
+  },
+  bloodGroup: {
+    type: String,
+    enum: {
+      values: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+      message: "{VALUE} this not a proper blood group",
+    },
+    required: true,
+  },
   presentAddress: { type: String, required: true },
   permanentAddress: { type: String, required: true },
-  guardian: guardianSchema,
-  localGuardian: loaclGuardanSchema,
+  guardian: {
+    type: guardianSchema,
+    required: [true, "enter your guardian details"],
+  },
+  localGuardian: {
+    type: loaclGuardanSchema,
+    required: [true, "We need your local guardian details for emergency"],
+  },
   profileImage: { type: String },
-  isActive: ["active", "block"],
+  isActive: {
+    type: String,
+    enum: ["active", "block"],
+    default: "active",
+  },
 });
 
 // MODEL CREATION
