@@ -1,21 +1,12 @@
 import { Schema, model } from "mongoose";
 import { Guardian, Student, UserName } from "./student/student.interface";
-import validator from "validator";
+// import validator from "validator";
 
 //schema class e student er instance userName set kore type er moto use kora
 const userNameSchema = new Schema<UserName>({
   firstName: {
     type: String,
     required: [true, "vi first name lagbei lagbe"],
-    maxlength: 15,
-    minLength: 2,
-    validate: {
-      validator: function (value: string) {
-        const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1);
-        return firstNameStr === value;
-      },
-      message: "{VALUE} is not in capitalize format",
-    },
   },
   lastName: {
     type: String,
@@ -69,19 +60,19 @@ const studentSchema = new Schema<Student>({
     type: String,
     required: [true, "please enter your email address"],
     unique: true,
-    validate: {
-      validator: (value: string) => {
-        validator.isEmail(value);
-      },
-      message: "{VALUE} is not a valid email",
-    },
+    // validate: {
+    //   validator: (value: string) => {
+    //     validator.isEmail(value);
+    //   },
+    //   message: "{VALUE} is not a valid email",
+    // },
   },
   bloodGroup: {
     type: String,
-    enum: {
-      values: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-      message: "{VALUE} this not a proper blood group",
-    },
+    // enum: {
+    //   values: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+    //   message: "{VALUE} this not a proper blood group",
+    // },
     required: true,
   },
   presentAddress: { type: String, required: true },
